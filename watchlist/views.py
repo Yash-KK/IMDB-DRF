@@ -3,10 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
-from rest_framework.authentication import (
-    BasicAuthentication
-)
-
+from rest_framework.permissions import IsAuthenticated
 from .permissions import (
     IsOwnerOrReadOnly
 )
@@ -52,10 +49,13 @@ class ReviewCreate(generics.CreateAPIView):
             
         serializer.save(movie=movie, user=self.request.user)
 
-class ReviewList(generics.ListAPIView):
+class ReviewList(generics.ListAPIView):    
+    permission_classes =[IsAuthenticated]
+    
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-
+    
+    
     def get_queryset(self):
         movie_id = self.kwargs['pk']
         return Review.objects.filter(movie=movie_id) 
@@ -81,13 +81,12 @@ class MovieList(APIView):
         else:
             return Response(serializer.errors)
 
-class MovieDetail(APIView):    
-    authentication_classes = [BasicAuthentication]
+class MovieDetail(APIView):      
     def get_object(self, pk):
         try:
             return Movie.objects.get(pk=pk)
         except:
-            raise Http404
+            raise Http404 
         
     def get(self, request, pk):
         movie = self.get_object(pk)
