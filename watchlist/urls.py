@@ -9,7 +9,12 @@ from .views import (
     
     ReviewList,
     ReviewDetail,
-    ReviewCreate
+    ReviewCreate,
+    
+    
+    # For Filtering 
+    AllReviews,
+    MovieListGeneric
 )
 
 urlpatterns = [
@@ -24,6 +29,11 @@ urlpatterns = [
     
     path('stream/<int:pk>/reviews/', ReviewList.as_view(), name='review-list'),
     path('stream/reviews/<int:pk>/', ReviewDetail.as_view(), name='review-detail'),
-    path('stream/<int:pk>/review-create/', ReviewCreate.as_view(), name='review-create') 
+    path('stream/<int:pk>/review-create/', ReviewCreate.as_view(), name='review-create'),
+    
+    
+    # For testing out filtering functionality
+    path('reviews/', AllReviews.as_view(), name='reviews'),
+    path('movies/', MovieListGeneric.as_view(), name='all-movies')
     
 ]

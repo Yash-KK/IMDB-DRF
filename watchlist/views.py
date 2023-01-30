@@ -5,8 +5,10 @@ from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
 from .permissions import (
-    IsOwnerOrReadOnly
+    IsOwnerOrReadOnly,
+    isAdminorReadOnly
 )
+from .pagination import MovieListPagination
 
 #DJANGO
 from django.http import Http404
@@ -26,6 +28,26 @@ from .serializers import (
 
 # Create your views here.
 
+
+# Only to test filtering functionality
+class AllReviews(generics.ListAPIView):
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
+    
+    # Query Parameters
+    # def get_queryset(self):
+    #     queryset = Review.objects.all()
+    #     username = self.request.query_params.get('naam')
+    #     if username is not None:
+    #         queryset = queryset.filter(user__username=username)
+    #     return queryset
+
+# FOR TEST PURPOSES
+class MovieListGeneric(generics.ListAPIView):
+    pagination_class = MovieListPagination
+    serializer_class = MovieSerializer
+    queryset = Movie.objects.all()
+
 class ReviewCreate(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
@@ -33,7 +55,7 @@ class ReviewCreate(generics.CreateAPIView):
     def perform_create(self, serializer):
         movie_id = self.kwargs['pk']
         movie = Movie.objects.get(pk=movie_id) 
-                 
+        
         # raise an error if a review by a user already exists
         review_exists = Review.objects.filter(user=self.request.user, movie=movie).exists()
         if review_exists:
@@ -55,7 +77,7 @@ class ReviewList(generics.ListAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     
-    
+     
     def get_queryset(self):
         movie_id = self.kwargs['pk']
         return Review.objects.filter(movie=movie_id) 
@@ -66,7 +88,8 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     
-class MovieList(APIView):        
+class MovieList(APIView):    
+    permission_classes = [isAdminorReadOnly]    
     def get(self, request):
         movies = Movie.objects.all()
         serializer = MovieSerializer(movies, many=True)
@@ -82,6 +105,7 @@ class MovieList(APIView):
             return Response(serializer.errors)
 
 class MovieDetail(APIView):      
+    permission_classes = [isAdminorReadOnly]
     def get_object(self, pk):
         try:
             return Movie.objects.get(pk=pk)
@@ -110,6 +134,7 @@ class MovieDetail(APIView):
     
 
 class StreamingPList(APIView):
+    permission_classes = [isAdminorReadOnly]
     def get(self, request):
         platforms = StreamingPlatform.objects.all()
         serializer = StreamingPlatformSerializer(platforms, many=True)
@@ -126,6 +151,7 @@ class StreamingPList(APIView):
         
         
 class StreamingPDetail(APIView):
+    permission_classes = [isAdminorReadOnly]
     def get_object(self, pk):
         try:
             return StreamingPlatform.objects.get(pk=pk)
