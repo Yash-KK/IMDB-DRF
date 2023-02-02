@@ -32,15 +32,13 @@ from .serializers import (
 # Only to test filtering functionality
 class AllReviews(generics.ListAPIView):
     serializer_class = ReviewSerializer
-    queryset = Review.objects.all()
-    
-    # Query Parameters
-    # def get_queryset(self):
-    #     queryset = Review.objects.all()
-    #     username = self.request.query_params.get('naam')
-    #     if username is not None:
-    #         queryset = queryset.filter(user__username=username)
-    #     return queryset
+   
+    def get_queryset(self):
+        queryset = Review.objects.all()
+        username = self.request.query_params.get('username')
+        if username is not None:
+            queryset = queryset.filter(user__username=username)
+        return queryset 
 
 # FOR TEST PURPOSES
 class MovieListGeneric(generics.ListAPIView):
@@ -123,7 +121,7 @@ class MovieDetail(APIView):
         seiralizer = MovieSerializer(movie, data=data)
         if seiralizer.is_valid():
             seiralizer.save()
-            return Response(seiralizer.data)
+            return Response(seiralizer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(seiralizer.errors)
     
@@ -139,6 +137,7 @@ class StreamingPList(APIView):
         platforms = StreamingPlatform.objects.all()
         serializer = StreamingPlatformSerializer(platforms, many=True)
         return Response(serializer.data)
+    
     
     def post(self, request):
         data = request.data

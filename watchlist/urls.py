@@ -33,7 +33,7 @@ urlpatterns = [
     
     
     # For testing out filtering functionality
-    path('reviews/', AllReviews.as_view(), name='reviews'),
+    path('stream/all-reviews/', AllReviews.as_view(), name='all-reviews'),
     path('movies/', MovieListGeneric.as_view(), name='all-movies')
     
 ]
