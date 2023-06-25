@@ -1,5 +1,5 @@
 # IMDB-DRF Application
-### Technologies used: Django, Django Rest Framework, Docker.
+### Technologies used: Django, Django Rest Framework.
 <hr>
 <br>
 
