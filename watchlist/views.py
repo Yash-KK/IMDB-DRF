@@ -1,10 +1,11 @@
 from django.shortcuts import render
+from django.http import Http404
 
 #REST FRAMEWORK
 from rest_framework.response import Response
 from rest_framework import status, generics, serializers
 from rest_framework.views import APIView
-from django.http import Http404
+from rest_framework.throttling import ScopedRateThrottle
 
 from .permissions import (
     IsAdminOrReadOnly,
@@ -28,6 +29,9 @@ from .models import (
 
 class SPlatformListAPI(APIView):
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'platform-list'
+
     def get(self,request):
         splatforms = StreamingPlatform.objects.filter(active=True)
         serializer = SPlatformSerializer(splatforms, many=True)        
@@ -44,6 +48,8 @@ class SPlatformListAPI(APIView):
 
 class SplatformDetailAPI(APIView):
     permission_classes = [IsAdminOrReadOnly]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'platform-detail'
 
     def get_object(self, pk):
         try:
@@ -77,6 +83,10 @@ class SplatformDetailAPI(APIView):
 
 class WatchListAPI(APIView):
     permission_classes = [IsAdminOrReadOnly]
+    
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'watchlist'
+
     def get(self, request):
         watchlists = WatchList.objects.filter(active=True).order_by('created_at')
         serializer = WatchListSerializer(watchlists, many=True)
@@ -94,6 +104,8 @@ class WatchListAPI(APIView):
 class WatchListDetailAPI(APIView):
     permission_classes = [IsAdminOrReadOnly]
     
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'watch-detail'
     def get_object(self, pk):
         try:
             return WatchList.objects.get(pk=pk)

@@ -139,4 +139,15 @@ REST_FRAMEWORK = {
 }
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'platform-list': '20/day',
+        'platform-detail': '10/day',
 
+        'watchlist': '20/day',
+        'watch-detail': '10/day'
+    }
+}
